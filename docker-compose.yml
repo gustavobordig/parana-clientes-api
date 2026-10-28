@@ -1,0 +1,53 @@
+name: parana-clientes
+
+services:
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: parana-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks: [parana-credito]
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    platform: linux/amd64
+    container_name: parana-sqlserver
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${MSSQL_SA_PASSWORD:-Parana@2026}
+    ports:
+      - "1433:1433"
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P \"$$MSSQL_SA_PASSWORD\" -C -Q 'SELECT 1' || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 15
+      start_period: 20s
+    networks: [parana-credito]
+
+  clientes-api:
+    build: .
+    container_name: parana-clientes-api
+    environment:
+      ConnectionStrings__SqlServer: Server=sqlserver,1433;Database=clientes_db;User Id=sa;Password=${MSSQL_SA_PASSWORD:-Parana@2026};TrustServerCertificate=True
+      RabbitMq__Url: amqp://guest:guest@rabbitmq:5672/
+      Cors__Origens__0: http://localhost:5173
+      Cors__Origens__1: http://localhost:5174
+    ports:
+      - "5101:8080"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+      sqlserver:
+        condition: service_healthy
+    networks: [parana-credito]
+
+networks:
+  parana-credito:
+    name: parana-credito
