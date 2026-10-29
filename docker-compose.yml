@@ -39,6 +39,9 @@ services:
       RabbitMq__Url: amqp://guest:guest@rabbitmq:5672/
       Cors__Origens__0: http://localhost:5173
       Cors__Origens__1: http://localhost:5174
+      Autenticacao__Usuario: ${MODERADOR_USUARIO:-moderador}
+      Autenticacao__Senha: ${MODERADOR_SENHA:-moderador-local}
+      Autenticacao__ChaveAssinatura: ${JWT_CHAVE:-chave-local-de-desenvolvimento-com-mais-de-32-bytes}
     ports:
       - "5101:8080"
     depends_on:
