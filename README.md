@@ -8,6 +8,20 @@ Microsserviço de **cadastro de clientes** do fluxo de concessão de crédito. R
 | **Front da solução** | https://parana-credito-web.vercel.app |
 | **Stack** | .NET 10 · ASP.NET Core · EF Core + SQL Server · MassTransit 8 + RabbitMQ · xUnit |
 
+## Sumário
+
+- [A solução completa](#a-solução-completa)
+- [Endpoints](#endpoints)
+  - [Regras de validação](#regras-de-validação)
+  - [Evento publicado: ClienteCadastrado](#evento-publicado-clientecadastrado)
+- [Arquitetura](#arquitetura)
+- [Decisões técnicas](#decisões-técnicas)
+- [Como executar localmente](#como-executar-localmente)
+  - [Variáveis de ambiente](#variáveis-de-ambiente)
+- [Testes](#testes)
+- [Deploy](#deploy)
+- [Próximos passos](#próximos-passos)
+
 ## A solução completa
 
 O fluxo é dividido em três microsserviços independentes, um por repositório, que se comunicam apenas por eventos:
