@@ -1,5 +1,6 @@
 using Asp.Versioning;
 using Clientes.Api.Middlewares;
+using Clientes.Api.Seguranca;
 using Clientes.Application;
 using Clientes.Infrastructure;
 using Clientes.Infrastructure.Persistence;
@@ -32,6 +33,7 @@ builder.Services
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddSeguranca();
 
 builder.Services
     .AddApiVersioning(options =>
@@ -54,8 +56,16 @@ builder.Services.AddSwaggerGen(options =>
     {
         Title = "Clientes API",
         Version = "v1",
-        Description = "Cadastro de clientes. Cada cadastro publica o evento ClienteCadastrado."
+        Description = "Cadastro de clientes. Cada cadastro publica o evento ClienteCadastrado. A listagem exige token de moderador."
     });
+    options.AddSecurityDefinition(AutorizacaoSwaggerFilter.Esquema, new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        Description = "Token obtido em POST /api/v1/auth/login."
+    });
+    options.OperationFilter<AutorizacaoSwaggerFilter>();
 });
 
 var origens = builder.Configuration.GetSection("Cors:Origens").Get<string[]>() ?? [];
@@ -77,6 +87,9 @@ app.UseExceptionHandler();
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseSerilogRequestLogging();
 app.UseCors();
+app.UseRateLimiter();
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.UseSwagger();
 app.UseSwaggerUI(options => options.SwaggerEndpoint("/swagger/v1/swagger.json", "Clientes API v1"));

@@ -1,4 +1,5 @@
 using Clientes.Application.Abstractions;
+using Clientes.Infrastructure.Autenticacao;
 using Clientes.Infrastructure.Messaging;
 using Clientes.Infrastructure.Observability;
 using Clientes.Infrastructure.Persistence;
@@ -27,6 +28,15 @@ public static class DependencyInjection
         services.AddScoped<IUnitOfWork, UnitOfWork>();
         services.AddScoped<IPublicadorEventos, PublicadorEventos>();
         services.AddScoped<CorrelationContext>();
+
+        services.AddOptions<AutenticacaoOptions>()
+            .Bind(configuracao.GetSection(AutenticacaoOptions.Secao))
+            .Validate(o => o.CredenciaisConfiguradas, "Autenticacao:Usuario e Autenticacao:Senha são obrigatórios.")
+            .Validate(o => o.ChaveValida, $"Autenticacao:ChaveAssinatura deve ter pelo menos {AutenticacaoOptions.TamanhoMinimoChaveEmBytes} bytes.")
+            .Validate(o => o.ExpiracaoMinutos > 0, "Autenticacao:ExpiracaoMinutos deve ser maior que zero.")
+            .ValidateOnStart();
+        services.AddSingleton<IVerificadorCredenciais, VerificadorCredenciais>();
+        services.AddSingleton<IGeradorToken, GeradorTokenJwt>();
 
         services.AddMassTransit(bus =>
         {

@@ -9,5 +9,7 @@ public interface IClienteRepository
 
     Task<Cliente?> ObterPorIdAsync(Guid id, CancellationToken cancellationToken);
 
+    Task<(IReadOnlyList<Cliente> Clientes, int Total)> ListarAsync(int pagina, int tamanho, CancellationToken cancellationToken);
+
     void Adicionar(Cliente cliente);
 }

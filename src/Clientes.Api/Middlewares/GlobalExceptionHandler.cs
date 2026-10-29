@@ -25,6 +25,18 @@ internal sealed class GlobalExceptionHandler(
                 Title = "Cliente já cadastrado.",
                 Detail = conflito.Message
             },
+            CredenciaisInvalidasException credenciais => new ProblemDetails
+            {
+                Status = StatusCodes.Status401Unauthorized,
+                Title = "Não autorizado.",
+                Detail = credenciais.Message
+            },
+            ArgumentOutOfRangeException argumento => new ProblemDetails
+            {
+                Status = StatusCodes.Status400BadRequest,
+                Title = "Parâmetro inválido.",
+                Detail = argumento.Message
+            },
             _ => new ProblemDetails
             {
                 Status = StatusCodes.Status500InternalServerError,

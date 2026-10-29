@@ -15,5 +15,20 @@ internal sealed class ClienteRepository(ClientesDbContext contexto) : IClienteRe
             .AsNoTracking()
             .FirstOrDefaultAsync(c => c.Id == id, cancellationToken);
 
+    public async Task<(IReadOnlyList<Cliente> Clientes, int Total)> ListarAsync(int pagina, int tamanho, CancellationToken cancellationToken)
+    {
+        var consulta = contexto.Clientes.AsNoTracking();
+
+        var total = await consulta.CountAsync(cancellationToken);
+        var clientes = await consulta
+            .OrderByDescending(c => c.CriadoEm)
+            .ThenBy(c => c.Id)
+            .Skip((pagina - 1) * tamanho)
+            .Take(tamanho)
+            .ToListAsync(cancellationToken);
+
+        return (clientes, total);
+    }
+
     public void Adicionar(Cliente cliente) => contexto.Clientes.Add(cliente);
 }
