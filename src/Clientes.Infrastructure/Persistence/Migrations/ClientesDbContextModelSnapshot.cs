@@ -57,6 +57,8 @@ namespace Clientes.Infrastructure.Persistence.Migrations
                     b.HasIndex("Cpf")
                         .IsUnique();
 
+                    b.HasIndex("CriadoEm");
+
                     b.ToTable("Clientes", (string)null);
                 });
 

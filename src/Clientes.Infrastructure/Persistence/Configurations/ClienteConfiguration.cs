@@ -34,5 +34,6 @@ internal sealed class ClienteConfiguration : IEntityTypeConfiguration<Cliente>
         builder.Property(c => c.DataNascimento).HasColumnType("date");
         builder.Property(c => c.RendaMensal).HasPrecision(18, 2);
         builder.Property(c => c.CriadoEm);
+        builder.HasIndex(c => c.CriadoEm);
     }
 }
